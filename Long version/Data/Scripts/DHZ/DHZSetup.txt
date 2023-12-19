@@ -1,0 +1,223 @@
+// ----------------------------------
+// RSDK Project:  Sonic 2 Delta
+// Script Description:    DHZ Setup Object 
+// Script Author: Twanvanb1
+// ----------------------------------
+
+// ========================
+// Aliases
+// ========================
+
+private alias object.value0 	:	object.paletteTimer
+private alias object.value1 	:	object.paletteRow
+private alias object.value2 	:
+private alias object.value3 	:
+private alias object.value4 	:
+private alias object.value5 	:
+private alias object.value6 	:
+private alias object.value7 	:
+private alias object.value8 	:
+private alias object.value9 	:
+private alias object.value10 	:
+private alias object.value11 	:
+private alias object.value12 	:
+private alias object.value13 	:
+private alias object.value14 	:
+private alias object.value15 	:
+private alias object.value16 	:
+private alias object.value17 	:
+private alias object.value18 	:
+
+private alias object.xpos : player.xpos
+
+// Tracks
+private alias 0 : TRACK_STAGE
+private alias 1 : TRACK_ACTFINISH
+private alias 2 : TRACK_INVINCIBLE
+private alias 3 : TRACK_CONTINUE
+private alias 4 : TRACK_BOSS
+private alias 5 : TRACK_GAMEOVER
+private alias 6 : TRACK_DROWNING
+private alias 7 : TRACK_SUPER
+
+// Reserved Object Slots Aliases
+private alias 10 : SLOT_ZONESETUP
+private alias 25 : SLOT_MUSICEVENT_CHANGE
+private alias 26 : SLOT_MUSICEVENT_BOSS
+
+// Music Events
+private alias 0 : MUSICEVENT_FADETOBOSS
+private alias 1 : MUSICEVENT_FADETOSTAGE
+private alias 2 : MUSICEVENT_TRANSITION
+
+private alias 0 : MUSICEVENT_FLAG_NOCHANGE
+private alias 1 : MUSICEVENT_FLAG_SPEEDUP
+private alias 2 : MUSICEVENT_FLAG_SLOWDOWN
+
+// Music Loops
+
+private alias 293572 : MUSIC_LOOP_DHZ
+private alias 235236 : MUSIC_LOOP_DHZ_F
+
+private alias 38679  : MUSIC_LOOP_INV
+private alias 30897  : MUSIC_LOOP_INV_F
+
+// ========================
+// Function Declarations
+// ========================
+
+reserve function DHZSetup_SpeedUpMusic
+reserve function DHZSetup_SlowDownMusic
+
+// ========================
+// Static Values
+// ========================
+
+// ========================
+// Tables
+// ========================
+
+// ========================
+// Function Definitions
+// ========================
+
+private function DHZSetup_SpeedUpMusic
+	CheckEqual(object[SLOT_MUSICEVENT_CHANGE].type, TypeName[Music Event])
+	temp0 = checkResult
+	CheckEqual(object[SLOT_MUSICEVENT_CHANGE].propertyValue, MUSICEVENT_TRANSITION)
+	temp0 &= checkResult
+	CheckEqual(stage.musicFlag, MUSICEVENT_FLAG_NOCHANGE)
+	temp0 &= checkResult
+	if temp0 == 0
+		switch music.currentTrack
+		case TRACK_STAGE
+			SetMusicTrack("Invincibility_F.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV_F)
+			SwapMusicTrack("OilOcean_F.ogg", TRACK_STAGE, MUSIC_LOOP_DHZ_F, 8000)
+			break
+
+		case TRACK_INVINCIBLE
+			SetMusicTrack("OilOcean_F.ogg", TRACK_STAGE, MUSIC_LOOP_DHZ_F)
+			SwapMusicTrack("Invincibility_F.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV_F, 8000)
+			break
+
+		case TRACK_BOSS
+		case TRACK_DROWNING
+		case TRACK_SUPER
+			SetMusicTrack("OilOcean_F.ogg", TRACK_STAGE, MUSIC_LOOP_DHZ_F)
+			SetMusicTrack("Invincibility_F.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV_F)
+			break
+
+		end switch
+	else
+		stage.musicFlag = MUSICEVENT_FLAG_SPEEDUP
+	end if
+end function
+
+private function DHZSetup_SlowDownMusic
+	CheckEqual(object[SLOT_MUSICEVENT_CHANGE].type, TypeName[Music Event])
+	temp0 = checkResult
+	CheckEqual(object[SLOT_MUSICEVENT_CHANGE].propertyValue, MUSICEVENT_TRANSITION)
+	temp0 &= checkResult
+	CheckEqual(stage.musicFlag, MUSICEVENT_FLAG_NOCHANGE)
+	temp0 &= checkResult
+	if temp0 == 0
+		switch music.currentTrack
+		case TRACK_STAGE
+			SetMusicTrack("Invincibility.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV)
+			SwapMusicTrack("OilOcean.ogg", TRACK_STAGE, MUSIC_LOOP_DHZ, 12500)
+			break
+
+		case TRACK_INVINCIBLE
+			SetMusicTrack("OilOcean.ogg", TRACK_STAGE, MUSIC_LOOP_DHZ)
+			SwapMusicTrack("Invincibility.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV, 12500)
+			break
+
+		case TRACK_BOSS
+		case TRACK_DROWNING
+		case TRACK_SUPER
+			SetMusicTrack("OilOcean.ogg", TRACK_STAGE, MUSIC_LOOP_DHZ)
+			SetMusicTrack("Invincibility.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV)
+			break
+
+		end switch
+	else
+		stage.musicFlag = MUSICEVENT_FLAG_SLOWDOWN
+	end if
+end function
+
+// ========================
+// Events
+// ========================
+
+event ObjectUpdate
+	object.paletteTimer++
+		if object.paletteTimer == 8
+			object.paletteTimer = 0
+			GetPaletteEntry(0, 191, temp1)
+
+			GetPaletteEntry(0, 190, temp0)
+			SetPaletteEntry(0, 191, temp0)
+
+			GetPaletteEntry(0, 180, temp0)
+			SetPaletteEntry(0, 190, temp0)
+
+			GetPaletteEntry(0, 179, temp0)
+			SetPaletteEntry(0, 180, temp0)
+
+			SetPaletteEntry(0, 179, temp1)
+
+			// Winter Mode
+			GetPaletteEntry(1, 191, temp1)
+
+			GetPaletteEntry(1, 190, temp0)
+			SetPaletteEntry(1, 191, temp0)
+
+			GetPaletteEntry(1, 180, temp0)
+			SetPaletteEntry(1, 190, temp0)
+
+			GetPaletteEntry(1, 179, temp0)
+			SetPaletteEntry(1, 180, temp0)
+
+			SetPaletteEntry(1, 179, temp1)
+		end if
+end event
+
+event ObjectDraw
+	if player[0].xpos > 0x15800000
+		SetActivePalette(1, 0, screen.ysize)
+	else 
+		SetActivePalette(0, 0, screen.ysize)
+	end if
+end event
+
+event ObjectStartup
+	SetMusicTrack("OilOcean.ogg", 0, MUSIC_LOOP_DHZ)
+	SpeedUpMusic = DHZSetup_SpeedUpMusic
+	SlowDownMusic = DHZSetup_SlowDownMusic
+
+	CopyPalette(0, 0, 1, 0, 96)
+	CopyPalette(0, 192, 1, 192, 16)
+	LoadPalette("DHZ_Pal2.act", 1, 128, 0, 63)
+
+	animalType1 = TypeName[Flicky]
+	animalType2 = TypeName[Ricky]
+	object[SLOT_ZONESETUP].type = TypeName[DHZ Setup]
+	object[SLOT_ZONESETUP].priority = PRIORITY_ACTIVE
+	tileLayer[1].scrollPos 		= -0x80000
+
+end event
+
+// ========================
+// Editor Events
+// ========================
+
+event RSDKDraw
+  DrawSprite(0)
+end event
+
+event RSDKLoad
+  LoadSpriteSheet(Global/Display.gif)
+  SpriteFrame(-16, -16, 32, 32, 1, 143)
+
+  SetVariableAlias(ALIAS_VAR_PROPVAL, unused)
+end event

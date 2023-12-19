@@ -1,0 +1,240 @@
+// ----------------------------------
+// RSDK Project:  Sonic Boomv4
+// Script Description:    PPZ Setup Object 
+// Script Author: Twanvanb1
+// ----------------------------------
+
+// ========================
+// Aliases
+// ========================
+
+private alias object.value0 	:	object.aniTileTimer
+private alias object.value1 	:	object.aniTileFrame
+private alias object.value2 	:	object.electricFloorTimer
+private alias object.value3 	:	object.electricFloorFrame
+private alias object.value4 	:
+private alias object.value5 	:
+private alias object.value6 	:
+private alias object.value7 	:
+private alias object.value8 	:
+private alias object.value9 	:
+private alias object.value10 	:
+private alias object.value11 	:
+
+// Tracks
+private alias 0 : TRACK_STAGE
+private alias 1 : TRACK_ACTFINISH
+private alias 2 : TRACK_INVINCIBLE
+private alias 3 : TRACK_CONTINUE
+private alias 4 : TRACK_BOSS
+private alias 5 : TRACK_GAMEOVER
+private alias 6 : TRACK_DROWNING
+private alias 7 : TRACK_SUPER
+
+// Reserved Object Slots Aliases
+private alias 10 : SLOT_ZONESETUP
+private alias 25 : SLOT_MUSICEVENT_CHANGE
+private alias 26 : SLOT_MUSICEVENT_BOSS
+
+// Music Events
+private alias 0 : MUSICEVENT_FADETOBOSS
+private alias 1 : MUSICEVENT_FADETOSTAGE
+private alias 2 : MUSICEVENT_TRANSITION
+
+private alias 0 : MUSICEVENT_FLAG_NOCHANGE
+private alias 1 : MUSICEVENT_FLAG_SPEEDUP
+private alias 2 : MUSICEVENT_FLAG_SLOWDOWN
+
+// Music Loops
+
+private alias 684580 : MUSIC_LOOP_PPZ
+private alias 547578 : MUSIC_LOOP_PPZ_F
+
+private alias 38679  : MUSIC_LOOP_INV
+private alias 30897  : MUSIC_LOOP_INV_F
+
+// ========================
+// Function Declarations
+// ========================
+
+reserve function PPZSetup_SpeedUpMusic
+reserve function PPZSetup_SlowDownMusic
+
+// ========================
+// Static Values
+// ========================
+
+// ========================
+// Tables
+// ========================
+
+// ========================
+// Function Definitions
+// ========================
+
+private function PPZSetup_SpeedUpMusic
+	CheckEqual(object[SLOT_MUSICEVENT_CHANGE].type, TypeName[Music Event])
+	temp0 = checkResult
+	CheckEqual(object[SLOT_MUSICEVENT_CHANGE].propertyValue, MUSICEVENT_TRANSITION)
+	temp0 &= checkResult
+	CheckEqual(stage.musicFlag, MUSICEVENT_FLAG_NOCHANGE)
+	temp0 &= checkResult
+	if temp0 == 0
+		switch music.currentTrack
+		case TRACK_STAGE
+			SetMusicTrack("Invincibility_F.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV_F)
+			SwapMusicTrack("ChemicalPlant_F.ogg", TRACK_STAGE, MUSIC_LOOP_PPZ_F, 8000)
+			break
+
+		case TRACK_INVINCIBLE
+			SetMusicTrack("ChemicalPlant_F.ogg", TRACK_STAGE, MUSIC_LOOP_PPZ_F)
+			SwapMusicTrack("Invincibility_F.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV_F, 8000)
+			break
+
+		case TRACK_BOSS
+		case TRACK_DROWNING
+		case TRACK_SUPER
+			SetMusicTrack("ChemicalPlant_F.ogg", TRACK_STAGE, MUSIC_LOOP_PPZ_F)
+			SetMusicTrack("Invincibility_F.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV_F)
+			break
+
+		end switch
+	else
+		stage.musicFlag = MUSICEVENT_FLAG_SPEEDUP
+	end if
+end function
+
+private function PPZSetup_SlowDownMusic
+	CheckEqual(object[SLOT_MUSICEVENT_CHANGE].type, TypeName[Music Event])
+	temp0 = checkResult
+	CheckEqual(object[SLOT_MUSICEVENT_CHANGE].propertyValue, MUSICEVENT_TRANSITION)
+	temp0 &= checkResult
+	CheckEqual(stage.musicFlag, MUSICEVENT_FLAG_NOCHANGE)
+	temp0 &= checkResult
+	if temp0 == 0
+		switch music.currentTrack
+		case TRACK_STAGE
+			SetMusicTrack("Invincibility.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV)
+			SwapMusicTrack("ChemicalPlant.ogg", TRACK_STAGE, MUSIC_LOOP_PPZ, 12500)
+			break
+
+		case TRACK_INVINCIBLE
+			SetMusicTrack("ChemicalPlant.ogg", TRACK_STAGE, MUSIC_LOOP_PPZ)
+			SwapMusicTrack("Invincibility.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV, 12500)
+			break
+
+		case TRACK_BOSS
+		case TRACK_DROWNING
+		case TRACK_SUPER
+			SetMusicTrack("ChemicalPlant.ogg", TRACK_STAGE, MUSIC_LOOP_PPZ)
+			SetMusicTrack("Invincibility.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV)
+			break
+
+		end switch
+	else
+		stage.musicFlag = MUSICEVENT_FLAG_SLOWDOWN
+	end if
+end function
+
+// ========================
+// Events
+// ========================
+
+event ObjectUpdate
+	object.aniTileTimer++
+	if object.aniTileTimer > 4
+		object.aniTileTimer = 0
+		object.aniTileFrame++
+		object.aniTileFrame %= 4
+
+		temp0 = object.aniTileFrame
+		temp0 += 720
+		Copy16x16Tile(152, temp0)
+		
+		temp0 = 4
+		temp0 += object.aniTileFrame
+		temp0 += 720
+		Copy16x16Tile(153, temp0)
+
+		temp0 = 8
+		temp0 += object.aniTileFrame
+		temp0 += 720
+		Copy16x16Tile(156, temp0)
+
+		temp0 = 12
+		temp0 += object.aniTileFrame
+		temp0 += 720
+		Copy16x16Tile(157, temp0)
+
+		temp0 = 16
+		temp0 += object.aniTileFrame
+		temp0 += 720
+		Copy16x16Tile(158, temp0)
+
+		temp0 = 20
+		temp0 += object.aniTileFrame
+		temp0 += 720
+		Copy16x16Tile(159, temp0)
+
+		temp0 = 24
+		temp0 += object.aniTileFrame
+		temp0 += 720
+		Copy16x16Tile(174, temp0)
+
+		temp0 = 28
+		temp0 += object.aniTileFrame
+		temp0 += 720
+		Copy16x16Tile(175, temp0)
+	end if
+
+	object.electricFloorTimer++
+	if object.electricFloorTimer > 1
+		object.electricFloorTimer = 0
+		object.electricFloorFrame++
+		object.electricFloorFrame %= 2
+
+		temp0 = object.electricFloorFrame
+		temp0 += 752
+		Copy16x16Tile(459, temp0)
+		
+		temp0 = 2
+		temp0 += object.electricFloorFrame
+		temp0 += 752
+		Copy16x16Tile(461, temp0)
+	end if
+
+	// if object[0].xpos > 12032
+	// 	stage.newXBoundary1 = 12032
+	// end if
+end event
+
+event ObjectDraw
+end event
+
+event ObjectStartup
+	SetMusicTrack("ChemicalPlant.ogg", TRACK_STAGE, MUSIC_LOOP_PPZ)
+	SpeedUpMusic = PPZSetup_SpeedUpMusic
+	SlowDownMusic = PPZSetup_SlowDownMusic
+
+	animalType1 = TypeName[Flicky]
+	animalType2 = TypeName[Ricky]
+	
+	object[SLOT_ZONESETUP].type = TypeName[PPZ Setup]
+	object[SLOT_ZONESETUP].priority = PRIORITY_ACTIVE
+
+end event
+
+// ========================
+// Editor Events
+// ========================
+
+event RSDKDraw
+  DrawSprite(0)
+end event
+
+event RSDKLoad
+  LoadSpriteSheet("Global/Display.gif")
+  SpriteFrame(-16, -16, 32, 32, 1, 143)
+
+  SetVariableAlias(ALIAS_VAR_PROPVAL, "unused")
+end event

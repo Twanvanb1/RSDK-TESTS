@@ -1,0 +1,254 @@
+// ----------------------------------
+// RSDK Project:  CD Levels
+// Script Description:    CCZ Setup Object 
+// Script Author: Twanvanb1
+// ----------------------------------
+
+// ========================
+// Aliases
+// ========================
+
+private alias object.value0 	:	object.paletteTimer
+private alias object.value1 	:	object.paletteRow
+private alias object.value2 	:	object.deformTimer
+private alias object.value3 	:	object.turnDirection
+private alias object.value4 	:	object.bumperOscillation
+private alias object.value5 	:
+private alias object.value6 	:
+private alias object.value7 	:
+private alias object.value8 	:	object.scrollPos
+private alias object.value9 	:
+private alias object.value10 	:
+private alias object.value11 	:
+private alias object.value12 	:
+
+// Tracks
+private alias 0 : TRACK_STAGE
+private alias 1 : TRACK_ACTFINISH
+private alias 2 : TRACK_INVINCIBLE
+private alias 3 : TRACK_CONTINUE
+private alias 4 : TRACK_BOSS
+private alias 5 : TRACK_GAMEOVER
+private alias 6 : TRACK_DROWNING
+private alias 7 : TRACK_SUPER
+
+// Reserved Object Slots Aliases
+private alias 10 : SLOT_ZONESETUP
+private alias 25 : SLOT_MUSICEVENT_CHANGE
+private alias 26 : SLOT_MUSICEVENT_BOSS
+
+// Music Events
+private alias 0 : MUSICEVENT_FADETOBOSS
+private alias 1 : MUSICEVENT_FADETOSTAGE
+private alias 2 : MUSICEVENT_TRANSITION
+
+private alias 0 : MUSICEVENT_FLAG_NOCHANGE
+private alias 1 : MUSICEVENT_FLAG_SPEEDUP
+private alias 2 : MUSICEVENT_FLAG_SLOWDOWN
+
+// Music Loops
+
+private alias 358725 : MUSIC_LOOP_CCZ
+private alias 358725 : MUSIC_LOOP_CCZ_F
+
+private alias 38679  : MUSIC_LOOP_INV
+private alias 30897  : MUSIC_LOOP_INV_F
+
+// Deformation Layer
+
+private alias 1	:	DEFORM_FG_WATER
+private alias 2	:	DEFORM_BG
+
+// Tile Info
+
+private alias 1	:	TILEINFO_DIRECTION
+private alias 6	:	TILEINFO_ANGLEA
+
+// ========================
+// Function Declarations
+// ========================
+
+reserve function CCZSetup_SpeedUpMusic
+reserve function CCZSetup_SlowDownMusic
+
+// ========================
+// Static Values
+// ========================
+
+// ========================
+// Tables
+// ========================
+
+
+private table R3A_PaletteCycle1
+	0xe0e000, 0xe000e0, 0x000000, 0x00e0e0
+	0x000000, 0xe0a0e0, 0x000000, 0x000000
+	0x000000, 0x000000, 0x000000, 0x00e0e0
+	0x000000, 0x000000, 0x000000, 0x000000
+	0xe0e000, 0x000000, 0x000000, 0x00e0e0
+	0x000000, 0x000000, 0x000000, 0x000000
+end table
+
+private table R3A_PaletteCycle2
+	0xe0e000
+	0xe00000
+	0x000000
+	0xe0e000
+	0xe00000
+	0x000000
+end table
+
+// ========================
+// Function Definitions
+// ========================
+
+private function CCZSetup_SpeedUpMusic
+	CheckEqual(object[SLOT_MUSICEVENT_CHANGE].type, TypeName[Music Event])
+	temp0 = checkResult
+	CheckEqual(object[SLOT_MUSICEVENT_CHANGE].propertyValue, MUSICEVENT_TRANSITION)
+	temp0 &= checkResult
+	CheckEqual(stage.musicFlag, MUSICEVENT_FLAG_NOCHANGE)
+	temp0 &= checkResult
+	if temp0 == 0
+		switch music.currentTrack
+		case TRACK_STAGE
+			SetMusicTrack("Invincibility_F.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV_F)
+			SwapMusicTrack("R3A_F.ogg", TRACK_STAGE, MUSIC_LOOP_CCZ_F, 8000)
+			break
+
+		case TRACK_INVINCIBLE
+			SetMusicTrack("R3A_F.ogg", TRACK_STAGE, MUSIC_LOOP_CCZ_F)
+			SwapMusicTrack("Invincibility_F.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV_F, 8000)
+			break
+
+		case TRACK_BOSS
+		case TRACK_DROWNING
+		case TRACK_SUPER
+			SetMusicTrack("R3A_F.ogg", TRACK_STAGE, MUSIC_LOOP_CCZ_F)
+			SetMusicTrack("Invincibility_F.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV_F)
+			break
+
+		end switch
+	else
+		stage.musicFlag = MUSICEVENT_FLAG_SPEEDUP
+	end if
+end function
+
+private function CCZSetup_SlowDownMusic
+	CheckEqual(object[SLOT_MUSICEVENT_CHANGE].type, TypeName[Music Event])
+	temp0 = checkResult
+	CheckEqual(object[SLOT_MUSICEVENT_CHANGE].propertyValue, MUSICEVENT_TRANSITION)
+	temp0 &= checkResult
+	CheckEqual(stage.musicFlag, MUSICEVENT_FLAG_NOCHANGE)
+	temp0 &= checkResult
+	if temp0 == 0
+		switch music.currentTrack
+		case TRACK_STAGE
+			SetMusicTrack("Invincibility.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV)
+			SwapMusicTrack("R3A.ogg", TRACK_STAGE, MUSIC_LOOP_CCZ, 12500)
+			break
+
+		case TRACK_INVINCIBLE
+			SetMusicTrack("R3A.ogg", TRACK_STAGE, MUSIC_LOOP_CCZ)
+			SwapMusicTrack("Invincibility.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV, 12500)
+			break
+
+		case TRACK_BOSS
+		case TRACK_DROWNING
+		case TRACK_SUPER
+			SetMusicTrack("R3A.ogg", TRACK_STAGE, MUSIC_LOOP_CCZ)
+			SetMusicTrack("Invincibility.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV)
+			break
+
+		end switch
+	else
+		stage.musicFlag = MUSICEVENT_FLAG_SLOWDOWN
+	end if
+end function
+
+// ========================
+// Events
+// ========================
+
+event ObjectUpdate
+	object.paletteTimer++
+		if object.paletteTimer > 4
+			object.paletteTimer = 0
+			rotatePalette(0, 231, 234, false)
+		end if
+end event
+
+event ObjectDraw
+	Object.deformTimer++
+	if Object.deformTimer > 0
+		TileLayer[1].DeformationOffset++
+		TileLayer[2].DeformationOffset++
+		Object.deformTimer = 0
+	end if
+
+	// Draw FG Construction Sprites
+	// (Even if Forever allows for wider screen sizes, it doesn't actually update this code for that, which is why the giders just appear and disappear)
+	temp0 = screen.xoffset
+	temp0 *= 6
+	temp0 >>= 3
+	temp0 &= 511
+	FlipSign(temp0)
+
+	temp0 += object.scrollPos
+	temp1 = screen.yoffset
+	temp1 >>= 1
+	temp1 &= 255
+	FlipSign(temp1)
+	
+	DrawSpriteScreenFX(0, FX_INK, temp0, temp1)
+	DrawSpriteScreenFX(1, FX_INK, temp0, temp1)
+end event
+
+event ObjectStartup
+
+	SetMusicTrack("R3A.ogg", TRACK_STAGE, MUSIC_LOOP_CCZ)
+	SpeedUpMusic = CCZSetup_SpeedUpMusic
+	SlowDownMusic = CCZSetup_SlowDownMusic
+
+	LoadSpriteSheet("Mustafar/Objects.gif")
+	// Sprite Frames - Foreground Girder
+	SpriteFrame(-24, 0, 48, 112, 1, 1)
+	SpriteFrame(-24, 112, 48, 112, 1, 1)
+
+	SetLayerDeformation(DEFORM_BG, 72, 3, 0, 0, 0)
+
+	//tileLayer[2].scrollPos 		= -0x256000
+
+
+	animalType1 = TypeName[Flicky]
+	animalType2 = TypeName[Ricky]
+
+	object[SLOT_ZONESETUP].type = TypeName[Mustafar Setup]
+	object[SLOT_ZONESETUP].priority = PRIORITY_ACTIVE
+	object[SLOT_ZONESETUP].drawOrder = 2
+	object[SLOT_ZONESETUP].inkEffect = INK_ALPHA
+	object[SLOT_ZONESETUP].alpha = 0xB0
+
+	temp0 = screen.xsize
+	temp0 -= 72
+	object[SLOT_ZONESETUP].scrollPos = temp0
+	
+	temp0 = screen.xcenter
+	temp0 >>= 2
+	object[SLOT_ZONESETUP].scrollPos -= temp0
+end event
+
+// ========================
+// Editor Events
+// ========================
+
+event RSDKDraw
+  DrawSprite(0)
+end event
+
+event RSDKLoad
+  LoadSpriteSheet("Global/Display.gif")
+  SpriteFrame(-16, -16, 32, 32, 1, 143)
+
+  SetVariableAlias(ALIAS_VAR_PROPVAL, "unused")
+end event

@@ -1,0 +1,269 @@
+// ----------------------------------
+// RSDK Project:  Long Version RSDKv4
+// Script Description:    GCZ Setup Object 
+// Script Author: Twanvanb1
+// ----------------------------------
+
+// ========================
+// Aliases
+// ========================
+
+private alias object.value0 	:	object.palRotateTimer1
+private alias object.value1 	:	object.palRotateTimer2
+private alias object.value2 	:	object.paletteCycle
+private alias object.value3 	:	object.palRotateTimer3
+private alias object.value4 	:	object.paletteCycle2
+private alias object.value5 	:	object.paletteTimer4
+private alias object.value6 	:	object.paletteRow
+private alias object.value7 	:
+private alias object.value8 	:
+private alias object.value9 	:
+private alias object.value10 	:
+private alias object.value11 	:
+private alias object.value12 	:
+private alias object.value13 	:
+private alias object.value14 	:
+private alias object.value15 	:
+
+// Tracks
+private alias 0 : TRACK_STAGE
+private alias 1 : TRACK_ACTFINISH
+private alias 2 : TRACK_INVINCIBLE
+private alias 3 : TRACK_CONTINUE
+private alias 4 : TRACK_BOSS
+private alias 5 : TRACK_GAMEOVER
+private alias 6 : TRACK_DROWNING
+private alias 7 : TRACK_SUPER
+
+// Reserved Object Slots Aliases
+private alias 10 : SLOT_ZONESETUP
+private alias 25 : SLOT_MUSICEVENT_CHANGE
+private alias 26 : SLOT_MUSICEVENT_BOSS
+
+// Music Events
+private alias 0 : MUSICEVENT_FADETOBOSS
+private alias 1 : MUSICEVENT_FADETOSTAGE
+private alias 2 : MUSICEVENT_TRANSITION
+
+private alias 0 : MUSICEVENT_FLAG_NOCHANGE
+private alias 1 : MUSICEVENT_FLAG_SPEEDUP
+private alias 2 : MUSICEVENT_FLAG_SLOWDOWN
+
+// Music Loops
+
+private alias 95868 : MUSIC_LOOP_GCZ
+private alias 76718 : MUSIC_LOOP_GCZ_F
+
+private alias 38679  : MUSIC_LOOP_INV
+private alias 30897  : MUSIC_LOOP_INV_F
+
+// ========================
+// Function Declarations
+// ========================
+
+reserve function GCZSetup_SpeedUpMusic
+reserve function GCZSetup_SlowDownMusic
+
+// ========================
+// Static Values
+// ========================
+
+// ========================
+// Tables
+// ========================
+
+private table GCZLightningCycle
+	0xE0E0E0
+	0xC0C0E0
+	0x8080E0
+	0x4040E0
+	0x0020E0
+	0x0020D0
+	0x002080
+	0x002060
+	0x002040
+end table
+
+private table GCZLightningDelay
+	8, 8, 8, 8, 8, 8, 8, 8, 64
+end table
+
+private table GCZGhostCycle
+	0x000000
+	0x000040
+	0x000080
+	0x4040C0
+	0x8080E0
+	0xC0C0E0
+	0xE0E0E0
+	0xC0C0E0
+	0x8080E0
+	0x4040C0
+	0x000080
+	0x000040
+end table
+
+private table GCZGhostDelay
+	42, 8, 8, 8, 8, 8, 40, 8, 8, 8, 8, 8
+end table
+
+private table GCZpaletteCycle
+	0xC06020, 0xA06000, 0x804020
+	0xD08040, 0xC06020, 0xB06000
+	0xD08040, 0xC06020, 0xB06000
+	0xE0B040, 0xC08040, 0xC06020
+	0xB06020, 0x804020, 0x604020
+end table
+
+// ========================
+// Function Definitions
+// ========================
+
+private function GCZSetup_SpeedUpMusic
+	CheckEqual(object[SLOT_MUSICEVENT_CHANGE].type, TypeName[Music Event])
+	temp0 = checkResult
+	CheckEqual(object[SLOT_MUSICEVENT_CHANGE].propertyValue, MUSICEVENT_TRANSITION)
+	temp0 &= checkResult
+	CheckEqual(stage.musicFlag, MUSICEVENT_FLAG_NOCHANGE)
+	temp0 &= checkResult
+	if temp0 == 0
+		switch music.currentTrack
+		case TRACK_STAGE
+			SetMusicTrack("Invincibility_F.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV_F)
+			SwapMusicTrack("CasinoNight2_F.ogg", TRACK_STAGE, MUSIC_LOOP_GCZ_F, 8000)
+			break
+
+		case TRACK_INVINCIBLE
+			SetMusicTrack("CasinoNight2_F.ogg", TRACK_STAGE, MUSIC_LOOP_GCZ_F)
+			SwapMusicTrack("Invincibility_F.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV_F, 8000)
+			break
+
+		case TRACK_BOSS
+		case TRACK_DROWNING
+		case TRACK_SUPER
+			SetMusicTrack("CasinoNight2_F.ogg", TRACK_STAGE, MUSIC_LOOP_GCZ_F)
+			SetMusicTrack("Invincibility_F.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV_F)
+			break
+
+		end switch
+	else
+		stage.musicFlag = MUSICEVENT_FLAG_SPEEDUP
+	end if
+end function
+
+private function GCZSetup_SlowDownMusic
+	CheckEqual(object[SLOT_MUSICEVENT_CHANGE].type, TypeName[Music Event])
+	temp0 = checkResult
+	CheckEqual(object[SLOT_MUSICEVENT_CHANGE].propertyValue, MUSICEVENT_TRANSITION)
+	temp0 &= checkResult
+	CheckEqual(stage.musicFlag, MUSICEVENT_FLAG_NOCHANGE)
+	temp0 &= checkResult
+	if temp0 == 0
+		switch music.currentTrack
+		case TRACK_STAGE
+			SetMusicTrack("Invincibility.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV)
+			SwapMusicTrack("CasinoNight2.ogg", TRACK_STAGE, MUSIC_LOOP_GCZ, 12500)
+			break
+
+		case TRACK_INVINCIBLE
+			SetMusicTrack("CasinoNight2.ogg", TRACK_STAGE, MUSIC_LOOP_GCZ)
+			SwapMusicTrack("Invincibility.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV, 12500)
+			break
+
+		case TRACK_BOSS
+		case TRACK_DROWNING
+		case TRACK_SUPER
+			SetMusicTrack("CasinoNight2.ogg", TRACK_STAGE, MUSIC_LOOP_GCZ)
+			SetMusicTrack("Invincibility.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV)
+			break
+
+		end switch
+	else
+		stage.musicFlag = MUSICEVENT_FLAG_SLOWDOWN
+	end if
+end function
+
+// ========================
+// Events
+// ========================
+
+event ObjectUpdate
+	rotatePalette(0, 170, 173, false)
+
+	object.palRotateTimer2++
+	GetTableValue(temp0, object.paletteCycle, GCZLightningDelay)
+	if object.palRotateTimer2 > temp0
+		object.palRotateTimer2 = 0
+		object.paletteCycle++
+		object.paletteCycle %= 9
+
+		GetTableValue(temp1, object.paletteCycle, GCZLightningCycle)
+		SetPaletteEntry(0, 175, temp1)
+	end if
+
+	object.palRotateTimer3++
+	GetTableValue(temp0, object.paletteCycle2, GCZGhostDelay)
+	if object.palRotateTimer3 > temp0
+		object.palRotateTimer3 = 0
+		object.paletteCycle2++
+		object.paletteCycle2 %= 12
+
+		GetTableValue(temp1, object.paletteCycle2, GCZGhostCycle)
+		SetPaletteEntry(0, 191, temp1)
+	end if
+
+	object.paletteTimer4++
+	if object.paletteTimer4 > 8
+		object.paletteTimer4 = 0
+
+		object.paletteRow++
+		object.paletteRow %= 5
+
+		arrayPos0 = object.paletteRow
+		arrayPos0 += 3
+		arrayPos0 %= 5
+		arrayPos0 *= 3
+		temp0 = 0
+		while temp0 < 3
+			temp1 = 188
+			temp1 += temp0
+			GetTableValue(temp2, arrayPos0, GCZpaletteCycle)
+			SetPaletteEntry(0, temp1, temp2)
+			arrayPos0++
+			temp0++
+		loop	
+		// GetTableValue(temp0, object.paletteRow, GCZpaletteCycle)
+		// SetPaletteEntry(0, 188, temp0)
+	end if
+	
+end event
+
+event ObjectDraw
+end event
+
+event ObjectStartup
+	SetMusicTrack("CasinoNight2.ogg", TRACK_STAGE, MUSIC_LOOP_GCZ)
+	SpeedUpMusic = GCZSetup_SpeedUpMusic
+	SlowDownMusic = GCZSetup_SlowDownMusic
+
+	animalType1 = TypeName[Flicky]
+	animalType2 = TypeName[Ricky]
+	object[SLOT_ZONESETUP].type = TypeName[GCZ Setup]
+	object[SLOT_ZONESETUP].priority = PRIORITY_ACTIVE
+
+end event
+
+// ========================
+// Editor Events
+// ========================
+
+event RSDKDraw
+  DrawSprite(0)
+end event
+
+event RSDKLoad
+  LoadSpriteSheet("Global/Display.gif")
+  SpriteFrame(-16, -16, 32, 32, 1, 143)
+
+  SetVariableAlias(ALIAS_VAR_PROPVAL, "unused")
+end event
